@@ -1,14 +1,22 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { initNeural } from "./core/neural"
 import NeoCard from "./components/NeoCard"
 import NeoButton from "./components/NeoButton"
+import NeoToggle from "./components/NeoToggle"
+import NeoProgressBar from "./components/NeoProgressBar"
+import NeoInput from "./components/NeoInput";
+import NeoTextArea from "./components/NeoTextArea";
 import "./index.css"
 
 export default function App() {
+  // Inicialización de la red neuronal
   useEffect(() => {
     const canvas = document.getElementById("neural") as HTMLCanvasElement
     if (canvas) initNeural(canvas)
   }, [])
+
+  // Estado para el interruptor táctico
+  const [autoSync, setAutoSync] = useState(true);
 
   return (
     // Contenedor principal con fondo oscuro puro y tipografía de sistema
@@ -18,11 +26,10 @@ export default function App() {
 
       <div className="relative z-10 max-w-[1400px] mx-auto space-y-8">
 
-        {/* Header Section (Estilo Panel de Mando) */}
+        {/* --- HEADER --- */}
         <header className="flex justify-between items-start pb-4 border-b border-[#00e5ff]/30">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 flex items-center justify-center border border-[#00e5ff] bg-[#00e5ff]/10 rounded-sm relative">
-              {/* Pequeñas cruces decorativas en el logo */}
               <div className="absolute top-0 left-0 w-1 h-1 border-t border-l border-[#00e5ff]"></div>
               <div className="absolute bottom-0 right-0 w-1 h-1 border-b border-r border-[#00e5ff]"></div>
               <span className="text-[#00e5ff] font-bold text-2xl font-mono leading-none mt-1 text-glow-cyan">A</span>
@@ -47,7 +54,7 @@ export default function App() {
           </NeoButton>
         </header>
 
-        {/* Top Status Row (Usando el nuevo NeoCard con prop "color") */}
+        {/* --- TOP STATUS ROW --- */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <NeoCard title="Supervisor" value="4" status="ONLINE" color="cyan" />
           <NeoCard title="Docker" value="SYS" status="ONLINE" color="cyan" />
@@ -56,19 +63,19 @@ export default function App() {
           <NeoCard title="Ollama" value="2" status="MODELS" color="orange" />
         </div>
 
-        {/* Middle Detail Row */}
+        {/* --- MIDDLE DETAIL ROW --- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* UAEs Section (Reconstruido como Tech Panel para soportar listas) */}
-          <div className="tech-panel p-5 lg:col-span-1 flex flex-col relative group">
+          {/* UAEs Section */}
+          <div className="glass-panel p-5 lg:col-span-1 flex flex-col relative group" style={{ borderTopColor: 'rgba(0, 229, 255, 0.6)' }}>
             <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#00e5ff]"></div>
             <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#00e5ff]"></div>
             <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#00e5ff]"></div>
-            <div className="h-[2px] w-12 bg-[#00e5ff] opacity-70 mb-4"></div>
+            <div className="h-[2px] w-12 bg-[#00e5ff] opacity-70 mb-4 relative z-10"></div>
 
-            <div className="text-[10px] text-[#00e5ff]/70 tracking-[0.2em] uppercase font-mono mb-4">UAEs Activos</div>
+            <div className="text-[10px] text-[#00e5ff]/70 tracking-[0.2em] uppercase font-mono mb-4 relative z-10">UAEs Activos</div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 relative z-10">
               {[
                 { name: "UAE-Alpha", status: "RUNNING" },
                 { name: "UAE-Beta", hasButtons: true },
@@ -93,16 +100,52 @@ export default function App() {
             </div>
           </div>
 
-          {/* Balance Section */}
-          <div className="tech-panel p-5 lg:col-span-1 flex flex-col relative group">
+          <div className="glass-panel p-5 lg:col-span-1 flex flex-col relative group" style={{ borderTopColor: 'rgba(0, 229, 255, 0.6)' }}>
             <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#00e5ff]"></div>
             <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#00e5ff]"></div>
             <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#00e5ff]"></div>
-            <div className="h-[2px] w-12 bg-[#00e5ff] opacity-70 mb-4"></div>
+            <div className="h-[2px] w-12 bg-[#00e5ff] opacity-70 mb-4 relative z-10"></div>
 
-            <div className="text-[10px] text-[#00e5ff]/70 tracking-[0.2em] uppercase font-mono mb-2">Saldo Génesis</div>
+            <div className="text-[10px] text-[#00e5ff]/70 tracking-[0.2em] uppercase font-mono mb-4 relative z-10">
+              Terminal I/O
+            </div>
 
-            <div className="mt-2 space-y-1">
+            <div className="space-y-6 relative z-10">
+              {/* Input de un sola línea */}
+              <NeoInput
+                label="TARGET_NODE"
+                placeholder="Ej: UAE-Alpha..."
+                color="cyan"
+              />
+
+              {/* Input en modo alerta (Naranja) */}
+              <NeoInput
+                label="OVERRIDE_KEY"
+                type="password"
+                placeholder="***"
+                color="orange"
+              />
+
+              {/* Text Area para inyectar código o prompts */}
+              <NeoTextArea
+                label="INJECT_PAYLOAD"
+                placeholder="Escribe la directiva aquí..."
+                rows={4}
+                color="cyan"
+              />
+            </div>
+          </div>
+
+          {/* Balance Section */}
+          <div className="glass-panel p-5 lg:col-span-1 flex flex-col relative group" style={{ borderTopColor: 'rgba(0, 229, 255, 0.6)' }}>
+            <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#00e5ff]"></div>
+            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#00e5ff]"></div>
+            <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#00e5ff]"></div>
+            <div className="h-[2px] w-12 bg-[#00e5ff] opacity-70 mb-4 relative z-10"></div>
+
+            <div className="text-[10px] text-[#00e5ff]/70 tracking-[0.2em] uppercase font-mono mb-2 relative z-10">Saldo Génesis</div>
+
+            <div className="mt-2 space-y-1 relative z-10">
               <div className="flex items-baseline gap-2">
                 <span className="text-4xl font-mono font-bold text-[#00e5ff] text-glow-cyan">5000.00</span>
                 <span className="text-[10px] text-[#00e5ff]/50 font-mono">USDT</span>
@@ -117,37 +160,37 @@ export default function App() {
             </div>
           </div>
 
-          {/* Sectors Section */}
-          <div className="tech-panel p-5 lg:col-span-1 flex flex-col relative group">
+          {/* NUEVO: System Control Section (Toggles y Progress Bars) */}
+          <div className="glass-panel p-5 lg:col-span-1 flex flex-col relative group" style={{ borderTopColor: 'rgba(255, 100, 0, 0.6)' }}>
             <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#ff6400]"></div>
             <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#ff6400]"></div>
             <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#ff6400]"></div>
-            <div className="h-[2px] w-12 bg-[#ff6400] opacity-70 mb-4"></div>
+            <div className="h-[2px] w-12 bg-[#ff6400] opacity-70 mb-4 relative z-10"></div>
 
-            <div className="text-[10px] text-[#ff6400]/70 tracking-[0.2em] uppercase font-mono mb-2">Sectores Descubiertos</div>
+            <div className="text-[10px] text-[#ff6400]/70 tracking-[0.2em] uppercase font-mono mb-4 relative z-10">System Control</div>
 
-            <div className="mt-2 space-y-4">
-              <div className="flex justify-between items-center border border-[#ff6400]/20 bg-[#ff6400]/5 p-2 rounded-sm">
-                <div className="flex gap-3 items-center">
-                  <span className="text-[#ff6400] font-mono text-xl font-bold text-glow-orange">2</span>
-                  <span className="text-xs text-white/80 font-mono">Sector A — <span className="text-[#ff6400] opacity-80">profitable</span></span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 px-2">
-                <span className="text-[#ff6400] opacity-60">›</span>
-                <span className="text-xs text-white/80 tracking-wide font-mono">Sector B <span className="mx-2 text-[#ff6400]/50">→</span> <span className="opacity-60 italic">stable</span></span>
-              </div>
+            <div className="space-y-4 relative z-10">
+              {/* Uso del Toggle */}
+              <NeoToggle label="AUTO_REBALANCE" checked={autoSync} onChange={setAutoSync} color="cyan" />
+              <NeoToggle label="OVERRIDE_LOCK" checked={!autoSync} onChange={() => { }} color="red" />
+            </div>
+
+            <div className="mt-8 space-y-4 relative z-10 border-t border-[#ff6400]/20 pt-4">
+              {/* Uso de las Barras de Progreso Segmentadas */}
+              <NeoProgressBar label="CPU_LOAD" value={42.5} color="cyan" />
+              <NeoProgressBar label="RAM_ALLOC" value={88.2} color="orange" segments={15} />
+              <NeoProgressBar label="RISK_FACTOR" value={95} color="red" />
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Log Section */}
+        {/* --- BOTTOM LOG SECTION --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          <div className="tech-panel p-5 relative">
-            <div className="text-[10px] text-[#00e5ff]/70 tracking-[0.2em] uppercase font-mono mb-4 border-b border-[#00e5ff]/20 pb-2">Logs Supervisor</div>
-            <div className="space-y-2 font-mono text-[9px]">
+          <div className="glass-panel p-5 relative" style={{ borderTopColor: 'rgba(0, 229, 255, 0.3)' }}>
+            <div className="text-[10px] text-[#00e5ff]/70 tracking-[0.2em] uppercase font-mono mb-4 border-b border-[#00e5ff]/20 pb-2 relative z-10">Logs Supervisor</div>
+            <div className="space-y-2 font-mono text-[9px] relative z-10">
               {[
                 { time: "23:45:01", msg: "Monitor intentando mitosis", tag: "INFO", v: "cyan" },
                 { time: "23:45:59", msg: "UAE-Beta: inactivo MAS_HB_ROUTE_FAIL", tag: "WARN", v: "orange" },
@@ -162,9 +205,9 @@ export default function App() {
             </div>
           </div>
 
-          <div className="tech-panel p-5 relative">
-            <div className="text-[10px] text-[#00e5ff]/70 tracking-[0.2em] uppercase font-mono mb-4 border-b border-[#00e5ff]/20 pb-2">Logs UAEs / Actividad</div>
-            <div className="space-y-2 font-mono text-[9px]">
+          <div className="glass-panel p-5 relative" style={{ borderTopColor: 'rgba(0, 229, 255, 0.3)' }}>
+            <div className="text-[10px] text-[#00e5ff]/70 tracking-[0.2em] uppercase font-mono mb-4 border-b border-[#00e5ff]/20 pb-2 relative z-10">Logs UAEs / Actividad</div>
+            <div className="space-y-2 font-mono text-[9px] relative z-10">
               {[
                 { uae: "UAE-Alpha :: INFO", msg: "Heartbeat recibido", tag: "SYNC", v: "cyan" },
                 { uae: "UAE-Beta  :: WARN", msg: "Reacción de mitosis", tag: "ERR", v: "red" },
