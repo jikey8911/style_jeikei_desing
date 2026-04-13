@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+  --color-neo-cyan: #00ffe0;
+  --color-neo-magenta: #ff007f;
+  --color-neo-amber: #ffb000;
+  --color-neo-bg: #010204;
+}
+
+@font-face {
+  font-family: 'Michroma';
+  src: url('https://fonts.googleapis.com/css2?family=Michroma&display=swap');
+}
+
+body {
+  background-color: var(--color-neo-bg);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+.michroma {
+  font-family: 'Michroma', sans-serif;
+}
+
+.glass-panel {
+  background: rgba(10, 20, 30, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 255, 224, 0.2);
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.8),
+    inset 0 0 15px rgba(0, 255, 224, 0.05);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de Scanlines de pantalla */
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.1) 50%);
+  background-size: 100% 4px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Utilidades de texto LED encendido por color */
+.text-glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.8), 0 0 20px rgba(0, 229, 255, 0.4);
+}
+
+.text-glow-orange {
+  text-shadow: 0 0 10px rgba(255, 100, 0, 0.8), 0 0 20px rgba(255, 100, 0, 0.4);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 10px rgba(255, 0, 60, 0.9), 0 0 20px rgba(255, 0, 60, 0.5);
+}
+
+.text-glow-magenta {
+  text-shadow: 0 0 10px rgba(255, 0, 255, 0.8), 0 0 20px rgba(255, 0, 255, 0.4);
+}
+
+.header-card {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  position: relative;
+}
+
+.header-card::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: currentColor;
+  box-shadow: 0 0 15px currentColor;
+}
+
+
+
+.tag {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
