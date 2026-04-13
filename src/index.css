@@ -168,3 +168,38 @@ body {
   font-weight: 700;
   text-transform: uppercase;
 }
+
+@keyframes row-scan {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(0, 229, 255, 0.2),
+      rgba(0, 229, 255, 0.5),
+      rgba(0, 229, 255, 0.2),
+      transparent);
+  animation: row-scan 3s infinite;
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.8), 0 0 15px rgba(0, 229, 255, 0.4);
+}

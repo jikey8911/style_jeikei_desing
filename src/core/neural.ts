@@ -16,21 +16,84 @@ export function initNeural(canvas: HTMLCanvasElement) {
     mouse.y = e.clientY
   })
 
-  // Sistema de destellos (ondas expansivas)
-  const ripples: { x: number, y: number, radius: number, alpha: number }[] = []
+  // Ahora cada onda (ripple) guarda su propio color y velocidad
+  const ripples: { x: number, y: number, radius: number, alpha: number, color: string, speed: number }[] = []
 
-  // Escuchar clics en cualquier parte de la ventana
+  // 🧠 FUNCIÓN INTELIGENTE: Detecta el color del botón o input
+  const getInteractionColor = (element: Element | null) => {
+    if (!element) return "0, 229, 255"; // Cian por defecto
+
+    const html = element.outerHTML.toLowerCase();
+
+    // Búsqueda ESTRICTA de códigos hexadecimales y clases exactas
+    // (Evita confundirse con palabras aleatorias en el código)
+    if (html.includes('#ff003c') || html.includes('text-glow-red') || html.includes('bg-[#ff003c]')) {
+      return "255, 0, 60"; // Rojo (Solo alertas críticas)
+    }
+
+    if (html.includes('#ff6400') || html.includes('text-glow-orange') || html.includes('bg-[#ff6400]')) {
+      return "255, 100, 0"; // Naranja (Warnings)
+    }
+
+    if (html.includes('#ff00ff') || html.includes('text-glow-magenta')) {
+      return "255, 0, 255"; // Magenta
+    }
+
+    // Si no encuentra los códigos exactos de arriba, SIEMPRE será CIAN
+    return "0, 229, 255";
+  }
+
+  // 🖱️ REACCIÓN AL CLIC
   window.addEventListener("click", (e) => {
+    const target = e.target as Element;
+
+    // EL FIX: Quitamos el 'div' genérico. Ahora solo escanea elementos interactivos reales.
+    // Si haces clic en el fondo (canvas o body), 'clickable' será null.
+    const clickable = target.closest('button, .glass-panel, input, textarea');
+
+    const color = getInteractionColor(clickable);
+
     ripples.push({
       x: e.clientX,
       y: e.clientY,
-      radius: 0,       // Empieza en el punto del clic
-      alpha: 1         // Máxima intensidad inicial
+      radius: 0,
+      alpha: 1, // Onda fuerte para clics
+      color: color,
+      speed: 15 // Velocidad estándar
     })
   })
 
-  // Mantenemos 200 nodos para tener densidad sin sacrificar rendimiento
-  const nodes = Array.from({ length: 400 }).map(() => ({
+  // ⌨️ REACCIÓN AL TECLADO
+  window.addEventListener("keydown", (e) => {
+    // Ignoramos teclas de control para no spamear la red
+    if (["Shift", "Control", "Alt", "Meta", "CapsLock", "Tab"].includes(e.key)) return;
+
+    const active = document.activeElement;
+    let x = Math.random() * canvas.width;
+    let y = canvas.height;
+    let color = "0, 229, 255";
+
+    // Si estás escribiendo en un input, la onda sale de ahí
+    if (active && active.getBoundingClientRect && active.tagName !== 'BODY') {
+      const rect = active.getBoundingClientRect();
+      // Hace que las ondas salgan de lugares aleatorios a lo largo de la caja de texto
+      x = rect.left + (Math.random() * rect.width);
+      y = rect.top + (rect.height / 2);
+      color = getInteractionColor(active);
+    }
+
+    ripples.push({
+      x,
+      y,
+      radius: 0,
+      alpha: 0.4, // Ondas más suaves para el teclado (para no cegarte al escribir rápido)
+      color: color,
+      speed: 25 // Ondas más rápidas, estilo "transmisión de datos"
+    })
+  })
+
+  // Generamos los nodos
+  const nodes = Array.from({ length: 200 }).map(() => ({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
     vx: (Math.random() - 0.5) * 0.6,
@@ -40,36 +103,42 @@ export function initNeural(canvas: HTMLCanvasElement) {
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // 1. Actualizar la expansión de los destellos
+    // 1. Expandir ondas
     ripples.forEach((r) => {
-      r.radius += 15    // Velocidad de la onda a través de la red
-      r.alpha -= 0.015  // Velocidad a la que se apaga
+      r.radius += r.speed
+      r.alpha -= r.speed * 0.0012 // Se desvanecen gradualmente
     })
 
-    // Limpiar de la memoria los destellos que ya se apagaron
+    // Limpiar ondas muertas
     for (let i = ripples.length - 1; i >= 0; i--) {
       if (ripples[i].alpha <= 0) ripples.splice(i, 1)
     }
 
-    // 2. Dibujar nodos y conexiones
+    // 2. Dibujar red neuronal
     nodes.forEach((n) => {
       n.x += n.vx
       n.y += n.vy
 
-      // Rebote en los bordes
       if (n.x < 0 || n.x > canvas.width) n.vx *= -1
       if (n.y < 0 || n.y > canvas.height) n.vy *= -1
 
-      // Calcular cuánta luz (highlight) recibe este nodo de cualquier destello activo
       let highlight = 0
-      ripples.forEach(r => {
-        const distToClick = Math.sqrt(Math.pow(n.x - r.x, 2) + Math.pow(n.y - r.y, 2))
-        const distanceToWaveFront = Math.abs(distToClick - r.radius)
+      let nodeColor = "0, 229, 255" // Color base del nodo
 
-        // Si el nodo está a menos de 80px del frente de la onda, se ilumina
+      // Verificar si alguna onda está golpeando este nodo
+      ripples.forEach(r => {
+        const dist = Math.sqrt(Math.pow(n.x - r.x, 2) + Math.pow(n.y - r.y, 2))
+        const distanceToWaveFront = Math.abs(dist - r.radius)
+
         if (distanceToWaveFront < 80) {
           const waveIntensity = 1 - (distanceToWaveFront / 80)
-          highlight = Math.max(highlight, waveIntensity * r.alpha)
+          const impact = waveIntensity * r.alpha
+
+          // Si el impacto es fuerte, el nodo ABSORBE el color de esa onda
+          if (impact > highlight) {
+            highlight = impact
+            nodeColor = r.color
+          }
         }
       })
 
@@ -81,15 +150,11 @@ export function initNeural(canvas: HTMLCanvasElement) {
 
         if (dist < 140) {
           const distanceFade = 1 - dist / 140
-
-          // Combinar la transparencia base con el brillo del clic
           const baseAlpha = distanceFade * 0.15
           const finalAlpha = baseAlpha + (highlight * 0.8)
 
-          // Color Azul/Cian "ONLINE" (37, 150, 190)
-          ctx.strokeStyle = `rgba(37, 150, 190, ${finalAlpha})`
-
-          // La línea se hace un poco más gruesa cuando pasa el destello
+          // La línea brilla con el color de la onda
+          ctx.strokeStyle = `rgba(${nodeColor}, ${finalAlpha})`
           ctx.lineWidth = highlight > 0.1 ? 1.5 : 0.8
 
           ctx.beginPath()
@@ -99,13 +164,13 @@ export function initNeural(canvas: HTMLCanvasElement) {
         }
       })
 
-      // Conexión interactiva con el mouse (Mantiene su propio brillo)
-      const dx = n.x - mouse.x
-      const dy = n.y - mouse.y
-      const distToMouse = Math.sqrt(dx * dx + dy * dy)
+      // Conexión con el mouse (mantiene el color base suave)
+      const dxMouse = n.x - mouse.x
+      const dyMouse = n.y - mouse.y
+      const distToMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse)
 
       if (distToMouse < 160) {
-        ctx.strokeStyle = `rgba(37, 150, 190, ${1 - distToMouse / 160})`
+        ctx.strokeStyle = `rgba(0, 229, 255, ${0.4 * (1 - distToMouse / 160)})`
         ctx.lineWidth = 1
         ctx.beginPath()
         ctx.moveTo(n.x, n.y)
@@ -113,13 +178,12 @@ export function initNeural(canvas: HTMLCanvasElement) {
         ctx.stroke()
       }
 
-      // Dibujar el punto del nodo
-      const nodeRadius = 2 + (highlight * 3) // El nodo "palpita" creciendo cuando pasa la onda
+      // Dibujar el punto brillante (Nodo)
+      const nodeRadius = 2 + (highlight * 3)
       const gradient = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, nodeRadius * 4)
 
-      // El centro del nodo es muy brillante, el borde se difumina
-      gradient.addColorStop(0, `rgba(37, 150, 190, ${0.6 + highlight})`)
-      gradient.addColorStop(1, "rgba(37, 150, 190, 0)")
+      gradient.addColorStop(0, `rgba(${nodeColor}, ${0.6 + highlight})`)
+      gradient.addColorStop(1, `rgba(${nodeColor}, 0)`)
 
       ctx.fillStyle = gradient
       ctx.beginPath()
