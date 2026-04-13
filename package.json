@@ -4,13 +4,13 @@
   "type": "module",
   "main": "./dist/jeikei-ui.umd.js",
   "module": "./dist/jeikei-ui.es.js",
-  "style": "./dist/style.css",
+  "style": "./dist/jeikei-ui.css",
   "exports": {
     ".": {
       "import": "./dist/jeikei-ui.es.js",
       "require": "./dist/jeikei-ui.umd.js"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/jeikei-ui.css"
   },
   "files": [
     "dist"
