@@ -1,24 +1,37 @@
 {
-  "name": "jeikei-pro",
+  "name": "@tu-usuario/jeikei-ui",
   "version": "1.0.0",
-  "private": true,
   "type": "module",
+  "main": "./dist/jeikei-ui.umd.js",
+  "module": "./dist/jeikei-ui.es.js",
+  "style": "./dist/style.css",
+  "exports": {
+    ".": {
+      "import": "./dist/jeikei-ui.es.js",
+      "require": "./dist/jeikei-ui.umd.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build"
   },
-  "dependencies": {
+  "peerDependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tailwind": "^4.0.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.0",
-    "tailwindcss": "^3.4.0",
+    "tailwindcss": "^3.4.19",
     "typescript": "^5.0.0",
     "vite": "^7.3.1"
   }

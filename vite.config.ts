@@ -1,17 +1,25 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      'react': path.resolve(__dirname, 'node_modules/react'),
-      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+  build: {
+    lib: {
+      // El archivo que acabamos de crear
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'JeiKeiUI',
+      fileName: (format) => `jeikei-ui.${format}.js`
     },
-    dedupe: ['react', 'react-dom'],
-  },
+    rollupOptions: {
+      // Asegurarnos de externalizar dependencias que el proyecto destino ya tendrá
+      external: ['react', 'react-dom', 'tailwindcss'],
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM'
+        }
+      }
+    }
+  }
 })

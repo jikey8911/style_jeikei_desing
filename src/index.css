@@ -19,38 +19,93 @@ body {
   color: #ffffff;
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
+  /* Fondo táctico sutil */
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+  background-position: center center;
 }
 
 .michroma {
   font-family: 'Michroma', sans-serif;
 }
 
+/* 🔥 GLASS-PANEL HOLOGRÁFICO CON BORDES REACTIVOS 🔥 */
 .glass-panel {
-  background: rgba(10, 20, 30, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 255, 224, 0.2);
-  box-shadow:
-    0 8px 32px 0 rgba(0, 0, 0, 0.8),
-    inset 0 0 15px rgba(0, 255, 224, 0.05);
-  border-radius: 4px;
   position: relative;
+  /* Gradiente radial: más oscuro en el centro, transparente en los bordes para dejar pasar la luz */
+  background: radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.08) 0%, rgba(0, 0, 0, 0.25) 100%);
+
+  /* Desenfoque calibrado para que el destello del fondo refracte en el borde */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+
+  /* Bordes externos de cristal semi-transparente */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(0, 229, 255, 0.4);
+  border-left: 1px solid rgba(0, 229, 255, 0.2);
+
+  /* Sombras estructuradas para el "Grosor del Vidrio" */
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.6),
+    /* Sombra de gravedad */
+    inset 0 0 0 1px rgba(0, 229, 255, 0.15),
+    /* Micro-borde interno de refracción (CLAVE) */
+    inset 0 0 25px rgba(0, 229, 255, 0.05),
+    /* Volumen del cristal */
+    0 0 15px rgba(0, 229, 255, 0.1);
+  /* Resplandor ambiental */
+
+  transition: all 0.3s ease;
   overflow: hidden;
 }
 
-/* Efecto de Scanlines de pantalla */
+/* 1. EL DESTELLO INTENSO (FLARE LÁSER SUPERIOR) */
 .glass-panel::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%,
-      rgba(0, 0, 0, 0.1) 50%);
-  background-size: 100% 4px;
+  top: 0;
+  left: 15%;
+  width: 70%;
+  height: 1px;
+  background: #00e5ff;
+  box-shadow:
+    0 0 10px 2px #00e5ff,
+    0 0 25px 5px rgba(0, 229, 255, 0.6),
+    0 0 40px 10px rgba(0, 229, 255, 0.2);
   z-index: 10;
-  pointer-events: none;
-  opacity: 0.3;
 }
 
+/* 2. REFLEJO DE VIDRIO + TUS SCANLINES ORIGINALES */
+.glass-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    /* Reflejo diagonal de luz */
+    linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.04) 25%, transparent 30%),
+    /* Tus Scanlines */
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+  background-size: 100% 100%, 100% 4px;
+  pointer-events: none;
+  z-index: 9;
+}
+
+/* Efecto al pasar el cursor (el cristal se energiza) */
+.glass-panel:hover {
+  background: radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.15) 0%, rgba(0, 0, 0, 0.3) 100%);
+  border-color: rgba(0, 229, 255, 0.6);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(0, 229, 255, 0.3),
+    inset 0 0 35px rgba(0, 229, 255, 0.1),
+    0 0 30px rgba(0, 229, 255, 0.25);
+}
+
+/* Animaciones */
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
@@ -105,8 +160,6 @@ body {
   background: currentColor;
   box-shadow: 0 0 15px currentColor;
 }
-
-
 
 .tag {
   font-size: 9px;
