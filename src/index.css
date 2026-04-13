@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@theme {
+:root {
   --color-neo-cyan: #00ffe0;
   --color-neo-magenta: #ff007f;
   --color-neo-amber: #ffb000;
@@ -15,7 +15,7 @@
 }
 
 body {
-  background-color: var(--color-neo-bg);
+  background-color: var(--color-neo-bg, #010204);
   color: #ffffff;
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
