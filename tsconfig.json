@@ -14,12 +14,18 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    /* CAMBIO CLAVE: Usa "Bundler" para que TS entienda cómo Vite maneja los módulos */
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
+    /* AÑADIDO: Referencia global a los tipos de Vite */
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "paths": {
       "@/*": [
         "./src/*"

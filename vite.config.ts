@@ -6,20 +6,21 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      // El archivo que acabamos de crear
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'JeiKeiUI',
-      fileName: (format) => `jeikei-ui.${format}.js`
+      fileName: (format: string) => `jeikei-ui.${format}.js`
     },
     rollupOptions: {
-      // Asegurarnos de externalizar dependencias que el proyecto destino ya tendrá
-      external: ['react', 'react-dom', 'tailwindcss'],
+      // Solo externalizamos React para que no se duplique
+      external: ['react', 'react-dom'],
       output: {
         globals: {
           react: 'React',
-          'react-dom': 'ReactDOM'
-        }
-      }
-    }
-  }
+          'react-dom': 'ReactDOM',
+        },
+      },
+    },
+    // ESTA OPCIÓN ES CLAVE: Fuerza la generación del CSS
+    cssCodeSplit: false,
+  },
 })
